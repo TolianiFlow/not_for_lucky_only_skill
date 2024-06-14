@@ -1,6 +1,5 @@
 СОЗДАНИЕ..
 
--- Create table Employees
 CREATE TABLE Employees (
     id UUID PRIMARY KEY,
     last_name VARCHAR(50) NOT NULL,
@@ -11,14 +10,12 @@ CREATE TABLE Employees (
     address VARCHAR(100) NOT NULL
 );
 
--- Create table Services
 CREATE TABLE Services (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     price DECIMAL(10, 2) NOT NULL
 );
 
--- Create table HistoryCost
 CREATE TABLE HistoryCost (
     id SERIAL PRIMARY KEY,
     service_id INTEGER NOT NULL REFERENCES Services(id),
@@ -27,7 +24,6 @@ CREATE TABLE HistoryCost (
     change_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create table Clients
 CREATE TABLE Clients (
     id UUID PRIMARY KEY,
     last_name VARCHAR(50) NOT NULL,
@@ -42,14 +38,12 @@ CREATE TABLE Clients (
     email VARCHAR(100) NOT NULL
 );
 
--- Create table Rooms
 CREATE TABLE Rooms (
     id SERIAL PRIMARY KEY,
     room_type VARCHAR(20) NOT NULL CHECK (room_type IN ('Одиночный', 'Двойной', 'Сьют', 'Люкс', 'Апартамент')),
     price DECIMAL(10, 2) NOT NULL
 );
 
--- Create table GuestCards
 CREATE TABLE GuestCards (
     id SERIAL PRIMARY KEY,
     client_id UUID NOT NULL REFERENCES Clients(id),
@@ -59,7 +53,6 @@ CREATE TABLE GuestCards (
     payment_type VARCHAR(20) NOT NULL
 );
 
--- Create table AdditionalServices
 CREATE TABLE AdditionalServices (
     id SERIAL PRIMARY KEY,
     guest_card_id INTEGER NOT NULL REFERENCES GuestCards(id),
@@ -134,3 +127,33 @@ VALUES
     (11, 8, 2),
     (12, 9, 3),
     (13, 10, 5);
+
+ФУНКЦИЯ...
+
+
+DECLARE
+    email_record RECORD;
+    is_valid BOOLEAN;
+BEGIN
+    FOR email_record IN
+        SELECT Email FROM Clients
+    LOOP
+        -- Check if the email address is valid based on the specified criteria
+        is_valid := email_record.Email ~ '^[A-Za-z0-9.%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$' AND
+                    email_record.Email !~ '[[]"<>'']';
+
+        -- Output the email address and its validity status
+        IF is_valid THEN
+            RAISE NOTICE 'Email Address: % - Valid: 1', email_record.Email;
+        ELSE
+            RAISE NOTICE 'Email Address: % - Valid: 0', email_record.Email;
+        END IF;
+    END LOOP;
+END;
+
+ТРИГГЕР... 
+BEGIN
+    INSERT INTO history_cost (change_date, service_id, old_price, new_price)
+    VALUES (NOW(), OLD.id, OLD.price, NEW.price);
+    RETURN NEW;
+END;
