@@ -100,11 +100,11 @@ VALUES
 
 INSERT INTO Rooms (id, room_type, price)
 VALUES
-    (1, 'Одиночный', 2000.00),
-    (2, 'Двойной', 3000.00),
-    (3, 'Сьют', 5000.00),
+    (1, 'Эконом-класс', 2000.00),
+    (2, 'Стандарт', 3000.00),
+    (3, 'Полулюкс', 5000.00),
     (4, 'Люкс', 8000.00),
-    (5, 'Апартамент', 10000.00);
+    (5, 'Президентский', 10000.00);
 
 INSERT INTO GuestCards (id, client_id, room_id, checkin_date, checkout_date, payment_type)
 VALUES
